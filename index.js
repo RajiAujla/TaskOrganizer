@@ -1,21 +1,35 @@
 import express from "express";
 import bodyParser from "body-parser";
+import pg from 'pg';
+import dotenv from 'dotenv';
 
+dotenv.config();
 const app = express();
 const port = 3000;
+
+const db = new pg.Client({
+  user: "postgres",
+  host: "localhost",
+  database: "ToDoOrganizer",
+  password: process.env.db_password,
+  port: 5433
+});
+db.connect();
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-let items = [
-  { id: 1, title: "Buy milk" },
-  { id: 2, title: "Finish homework" },
-];
+async function fetchItems(){
+  const result = await db.query("SELECT * FROM items");
+  return result.rows;
+}
 
-app.get("/", (req, res) => {
+app.get("/", async (req, res) => {
+  const toDoList = await fetchItems();
+  console.log(toDoList)
   res.render("index.ejs", {
     listTitle: "Today",
-    listItems: items,
+    listItems: toDoList,
   });
 });
 
