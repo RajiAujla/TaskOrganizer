@@ -52,6 +52,7 @@ app.post("/add", async (req, res) => {
       console.log("Itm not found")
       console.log(error);
     }
+    
   res.redirect("/");
 });
 
